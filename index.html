@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Online Poll System - Multiple Questions</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+    font-family: Arial;
+    background:#1e1e2f;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    margin:0;
+    color:white;
+}
+
+.poll-box{
+    background:#2c2c54;
+    padding:20px;
+    border-radius:10px;
+    width:400px;
+    max-width:95%;
+}
+
+h2{
+    text-align:center;
+}
+
+.option{
+    background:#353b48;
+    padding:8px;
+    margin:8px 0;
+    border-radius:6px;
+}
+
+button{
+    width:100%;
+    padding:10px;
+    margin-top:10px;
+    border:none;
+    background:#00a8ff;
+    color:white;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#0097e6;
+}
+
+.error{
+    color:red;
+    text-align:center;
+}
+
+.progress-bar{
+    background:#555;
+    height:18px;
+    border-radius:10px;
+    margin:5px 0;
+    overflow:hidden;
+}
+
+.progress{
+    background:#4cd137;
+    height:100%;
+    width:0%;
+    text-align:right;
+    font-size:12px;
+    padding-right:5px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="poll-box">
+
+    <h2 id="question"></h2>
+
+    <div id="options"></div>
+
+    <button onclick="submitVote()">Next</button>
+
+    <p class="error" id="error"></p>
+
+    <div id="results"></div>
+
+</div>
+
+<script>
+
+var pollData = [
+{
+    question: "Which Language Do You Like?",
+    options: ["JavaScript","Python","Java","C++"],
+    votes: [0,0,0,0]
+},
+{
+    question: "Which Web Technology Do You Prefer?",
+    options: ["HTML","CSS","JavaScript","React"],
+    votes: [0,0,0,0]
+},
+{
+    question: "Which Database Do You Like?",
+    options: ["MySQL","MongoDB","Oracle","Firebase"],
+    votes: [0,0,0,0]
+}
+];
+
+var currentQuestion = 0;
+
+function loadQuestion(){
+
+    document.getElementById("error").innerText = "";
+    document.getElementById("results").innerHTML = "";
+
+    var q = pollData[currentQuestion];
+
+    document.getElementById("question").innerText = q.question;
+
+    var optionsDiv = document.getElementById("options");
+    optionsDiv.innerHTML = "";
+
+    for(var i=0;i<q.options.length;i++){
+        optionsDiv.innerHTML +=
+        "<div class='option'>" +
+        "<input type='radio' name='vote' value='"+i+"'> "
+        + q.options[i] +
+        "</div>";
+    }
+}
+
+function submitVote(){
+
+    var selected =
+    document.querySelector('input[name="vote"]:checked');
+
+    if(!selected){
+        document.getElementById("error").innerText =
+        "Please select an option!";
+        return;
+    }
+
+    var index = parseInt(selected.value);
+    pollData[currentQuestion].votes[index]++;
+
+    currentQuestion++;
+
+    if(currentQuestion < pollData.length){
+        loadQuestion();
+    }
+    else{
+        showResults();
+    }
+}
+
+function showResults(){
+
+    document.getElementById("question").innerText =
+    "Poll Results";
+
+    document.getElementById("options").innerHTML = "";
+    document.querySelector("button").style.display="none";
+
+    var resultDiv = document.getElementById("results");
+
+    for(var q=0; q<pollData.length; q++){
+
+        var total = pollData[q].votes.reduce((a,b)=>a+b,0);
+
+        resultDiv.innerHTML +=
+        "<h4>"+pollData[q].question+"</h4>";
+
+        for(var i=0;i<pollData[q].options.length;i++){
+
+            var percent = total==0 ? 0 :
+            ((pollData[q].votes[i]/total)*100).toFixed(1);
+
+            resultDiv.innerHTML +=
+            pollData[q].options[i]+" - "+percent+"%";
+
+            resultDiv.innerHTML +=
+            "<div class='progress-bar'>" +
+            "<div class='progress' style='width:"
+            + percent + "%'>" +
+            percent + "%</div></div>";
+        }
+    }
+}
+
+loadQuestion();
+
+</script>
+<script type="text/javascript">
+    (function (l) {
+      if (l.search[1] === "/") {
+        var decoded = l.search
+          .slice(1)
+          .split("&")
+          .map(function (s) {
+            return s.replace(/~and~/g, "&");
+          })
+          .join("?");
+        window.history.replaceState(
+          null,
+          null,
+          l.pathname.slice(0, -1) + decoded + l.hash
+        );
+      }
+    })(window.location);
+  </script>
+
+</body>
+</html>
